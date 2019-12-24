@@ -15,6 +15,7 @@ npm run andriod
 npm run ios
 
 # build for production with minification
+mkdir release_ios
 npm run build-ios
 
 ```
