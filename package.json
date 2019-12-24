@@ -1,0 +1,40 @@
+{
+  "name": "call_me_timer",
+  "version": "0.0.2",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest",
+    "lint": "eslint .",
+    "build-ios": "react-native bundle --entry-file index.js --platform ios --dev false --bundle-output release_ios/index.ios.jsbundle --assets-dest release_ios/"
+  },
+  "dependencies": {
+    "animejs": "^3.1.0",
+    "axios": "^0.19.0",
+    "buffer": "^5.4.3",
+    "cheerio": "^1.0.0-rc.3",
+    "events": "^3.0.0",
+    "moment": "^2.24.0",
+    "native-base": "^2.13.8",
+    "react": "16.9.0",
+    "react-native": "0.61.5",
+    "react-native-modalbox": "^2.0.0",
+    "stream": "0.0.2",
+    "util": "^0.12.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.7.7",
+    "@babel/runtime": "^7.7.7",
+    "@react-native-community/eslint-config": "^0.0.5",
+    "babel-jest": "^24.9.0",
+    "eslint": "^6.8.0",
+    "jest": "^24.9.0",
+    "metro-react-native-babel-preset": "^0.57.0",
+    "react-test-renderer": "16.9.0"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}
