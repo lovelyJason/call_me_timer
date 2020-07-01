@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  StyleSheet
+  StyleSheet,
+  ImageBackground
 } from 'react-native';
 
 import { Container, View, Content, Form, Item, Input, Button, Text, Spinner, Toast, Root } from 'native-base';
@@ -29,7 +30,7 @@ class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      username: '',
+      username: '2121',
       password: '123456',
       spinnerDisplay: 'none',
       swipeToClose: true
@@ -37,15 +38,12 @@ class App extends React.Component {
     this.onLogin = this.onLogin.bind(this)
   }
   componentDidMount() {
-    // storage.load({
-    //   key: 'user'
-    // }).then(ret => {
-    //   // 如果找到数据，则在then方法中返回
-    //   console.log(res);
-    // })
   }
   componentWillUnmount() {
     clearTimeout(timeId)
+    this.setState = () => {
+      return
+    }
   }
   onUsernameChange(text) {
     this.setState({
@@ -65,18 +63,22 @@ class App extends React.Component {
     let loginUrl = `${baseUrl}/selfservice/login/`
     let selfUrl = `${baseUrl}/selfservice/selftransaction/`;
     let dataUrl = `${baseUrl}/grid/att/CardTimes/`
-    await this.setState({
+    this.setState({
       spinnerDisplay: 'flex'
     })
     let body = `username=${username}&password=${password}&template9=&finnger10=&finnger9=&template10=&login_type=pwd&client_language=zh-cn`
     let res = await axios.post(loginUrl, body)
     // console.log('login---', res)
     let { data } = res
+    // console.log(data)
     if (data !== 'ok') {
       Toast.show({
         text: data,
-        type: "success",
+        type: "error",
         position: "bottom"
+      })
+      this.setState({
+        spinnerDisplay: 'none'
       })
       return
     }
@@ -104,14 +106,26 @@ class App extends React.Component {
         //   },
         //   expires: null
         // });
-        Toast.show({
-          text: res.data,
-          type: "success",
-          position: "bottom"
-        })
-        let { data: { rows = [] } = {} } = res2
+        // Toast.show({
+        //   text: res.data,
+        //   type: "success",
+        //   position: "bottom"
+        // })
+        // console.log(res2.data)
+        let { rows = [] } = res2.data
         // console.log(res2)
-        let { card_date, card_times, DeptName, times, name } = {} = rows[0]
+        if (rows.length === 0) {
+          Toast.show({
+            text: '抱歉，您今天没有打卡,请别为难我',
+            type: "warn",
+            position: "bottom"
+          })
+          this.setState({
+            spinnerDisplay: 'none'
+          })
+          return
+        }
+        let { card_date, card_times, DeptName, times, name } = rows[0]
         await that.setState({
           name,
           card_date,
@@ -124,6 +138,7 @@ class App extends React.Component {
           that.refs.modal2.close()
         }, 5000);
       } else {
+        // console.log(11)
         Toast.show({
           text: data,
           type: "success",
@@ -152,28 +167,31 @@ class App extends React.Component {
     return (
       <Root>
         <Container style={styles.body}>
-          <Content>
-            <Form >
-              <Item>
-                <Input keyboardType="numeric" placeholder="Username" onChangeText={text => this.onUsernameChange(text)} />
-              </Item>
-              <Item last>
-                <Input defaultValue="123456" placeholder="Password" secureTextEntry={true} onChangeText={text => this.onPasswordChange(text)} />
-              </Item>
-              <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                <Button onPress={() => { this.onLogin() }} bordered light style={styles.btn} primary><Text> 查询打卡 </Text></Button>
-              </View>
-            </Form>
-            <Spinner style={{ display: this.state.spinnerDisplay }} color='red' />
-          </Content>
+          <ImageBackground source={require('./images/haha.gif')} style={{ height: 206 }}>
+          </ImageBackground>
+          <ImageBackground source={require('./images/bk.jpg')} style={{ width: '100%', height: '100%', opacity: 0.9 }}>
+            <Content style={styles.content}>
+              <Form>
+                <Item>
+                  <Input defaultValue="2121" keyboardType="numeric" placeholder="Username" onChangeText={text => this.onUsernameChange(text)} />
+                </Item>
+                <Item last>
+                  <Input defaultValue="123456" placeholder="Password" secureTextEntry={true} onChangeText={text => this.onPasswordChange(text)} />
+                </Item>
+                <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                  <Button success rounded onPress={() => { this.onLogin() }} style={styles.btn}><Text> 查询打卡 </Text></Button>
+                </View>
+              </Form>
+              <Spinner style={{ display: this.state.spinnerDisplay }} color='red' />
+            </Content>
+          </ImageBackground>
         </Container>
-        <Modal animationDuration={600} swipeToClose={this.state.swipeToClose} style={[styles.modal, styles.modal2]} backdrop={false} position={"top"} ref={"modal2"}>
-          <Text style={[styles.text, { color: "white" }]}>{DeptName}的小可爱{name}</Text>
+        <Modal animationDuration={1000} swipeToClose={this.state.swipeToClose} style={[styles.modal, styles.modal2]} backdrop={false} position={"top"} ref={"modal2"}>
+          <Text style={[styles.text, { color: "white" }]}>{DeptName}的{name}</Text>
           <Text style={[styles.text, { color: "white" }]}>您的最近一次打卡记录为:</Text>
           <Text style={[styles.text, { color: "white" }]}>{card_date}-{card_times}</Text>
           <Text style={[styles.text, { color: "white" }]}>今天已打卡{times}次</Text>
         </Modal>
-
       </Root>
     );
   }
@@ -181,19 +199,25 @@ class App extends React.Component {
 
 const styles = StyleSheet.create({
   body: {
-    paddingTop: 206,
+    // paddingTop: 206,
+    backgroundColor: '#fff'
+  },
+  content: {
+    height: '100%'
+    // background: require('./images/bk.jpg')
   },
   btn: {
     marginTop: 30,
     width: 100,
+    borderRadius: 10
   },
   modal: {
     justifyContent: 'center',
     alignItems: 'center'
   },
   modal2: {
-    paddingTop: 50,
-    height: 180,
+    paddingTop: 30,
+    height: 210,
     backgroundColor: "#3B5998"
   },
   modal4: {

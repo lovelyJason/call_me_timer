@@ -168,7 +168,7 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            versionNameSuffix = '1.0'
+            versionNameSuffix = '1.1'
         }
     }
 //    lintOptions {
