@@ -8,6 +8,8 @@ import axios from 'axios'
 import moment from 'moment'
 import cheerio from 'cheerio'
 import Modal from 'react-native-modalbox';
+import Storage from 'react-native-storage';
+import { AsyncStorage } from 'react-native';
 
 global.Buffer = global.Buffer || require('buffer').Buffer
 // global.XMLHttpRequest = global.originalXMLHttpRequest || global.XMLHttpRequest
@@ -17,6 +19,11 @@ global.Buffer = global.Buffer || require('buffer').Buffer
 //axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 var timeId = null
+var storage = new Storage({
+  storageBackend: AsyncStorage
+})
+
+global.storage = storage;
 
 class App extends React.Component {
   constructor(props) {
@@ -28,6 +35,14 @@ class App extends React.Component {
       swipeToClose: true
     }
     this.onLogin = this.onLogin.bind(this)
+  }
+  componentDidMount() {
+    // storage.load({
+    //   key: 'user'
+    // }).then(ret => {
+    //   // 如果找到数据，则在then方法中返回
+    //   console.log(res);
+    // })
   }
   componentWillUnmount() {
     clearTimeout(timeId)
@@ -46,23 +61,22 @@ class App extends React.Component {
     const that = this
     let username = this.state.username
     let password = this.state.password
-    let loginUrl = 'http://218.17.157.34:1234/selfservice/login/'
-    let selfUrl = 'http://218.17.157.34:1234/selfservice/selftransaction/';
-    let dataUrl = 'http://218.17.157.34:1234/grid/att/CardTimes/'
+    const baseUrl = `http://inmail.miz.so:1234`
+    let loginUrl = `${baseUrl}/selfservice/login/`
+    let selfUrl = `${baseUrl}/selfservice/selftransaction/`;
+    let dataUrl = `${baseUrl}/grid/att/CardTimes/`
     await this.setState({
       spinnerDisplay: 'flex'
     })
     let body = `username=${username}&password=${password}&template9=&finnger10=&finnger9=&template10=&login_type=pwd&client_language=zh-cn`
     let res = await axios.post(loginUrl, body)
+    // console.log('login---', res)
     let { data } = res
     if (data !== 'ok') {
       Toast.show({
         text: data,
         type: "success",
         position: "bottom"
-      })
-      this.setState({
-        spinnerDisplay: 'none'
       })
       return
     }
@@ -82,6 +96,14 @@ class App extends React.Component {
         }
       )
       if (typeof res2.data !== 'string') {
+        // 持久化存储
+        // storage.save({
+        //   key: 'user',  // 注意:请不要在key中使用_下划线符号!
+        //   data: {
+        //     username: this.state.username
+        //   },
+        //   expires: null
+        // });
         Toast.show({
           text: res.data,
           type: "success",
@@ -108,26 +130,22 @@ class App extends React.Component {
           position: "bottom"
         })
       }
-      that.setState({
-        spinnerDisplay: 'none'
-      })
     } catch (error) {
       Toast.show({
         text: error.message,
         type: "success",
         position: "bottom"
       })
-      that.setState({
-        spinnerDisplay: 'none'
-      })
     }
-
+    this.setState({
+      spinnerDisplay: 'none'
+    })
   }
   onUsernameFocus() {
-    
+
   }
   onPasswordFocus() {
-   
+
   }
   render() {
     const { name, card_date, card_times, DeptName, times } = this.state
@@ -163,7 +181,7 @@ class App extends React.Component {
 
 const styles = StyleSheet.create({
   body: {
-    marginTop: 206,
+    paddingTop: 206,
   },
   btn: {
     marginTop: 30,
